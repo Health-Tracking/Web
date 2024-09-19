@@ -44,4 +44,6 @@
 [앱 설치 방법 및 기본적인 사용 가이드를 제공하세요]
 
 ## 연락처
-[백은호](bhh0214@gmail.com)
+[백은호][bhh0214@gmail.com]
+
+[이정욱][https://github.com/kakao3450]
