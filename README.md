@@ -1,5 +1,12 @@
 # 환자 모니터링 시스템
 
+## 관련 링크
+[웹페이지 링크](https://mellifluous-frangollo-878d87.netlify.app/)
+
+[Web Repository](https://github.com/Health-Tracking/Web)
+
+[Mobile Repository](https://github.com/Health-Tracking/Mobile)
+
 ## 배경
 
 만성 질환자 및 중증 질환자에게 처방약을 정확히 복용하는 것은 매우 중요합니다. 약물 복용을 제대로 하지 않으면 치료 효과가 떨어지거나 부작용이 발생할 수 있습니다. 그러나 현재 주치의가 환자의 복약 상황을 실시간으로 확인할 방법이 없습니다. 
