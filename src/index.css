@@ -2,3 +2,33 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* 반응형 디자인을 위한 스타일 추가 */
+@media (max-width: 640px) {
+    .layout-content-container {
+        padding: 1rem;
+        /* 모바일에서 패딩 조정 */
+    }
+
+    .text-32px {
+        font-size: 24px;
+        /* 모바일에서 폰트 크기 조정 */
+    }
+
+    .min-w-72 {
+        min-width: 100%;
+        /* 모바일에서 최소 너비 조정 */
+    }
+
+    .flex-col {
+        flex-direction: column;
+        /* 모바일에서 세로 방향으로 배치 */
+    }
+
+    .flex-row {
+        flex-direction: column;
+        /* 모바일에서 세로 방향으로 배치 */
+    }
+}
+
+/* 추가적인 반응형 스타일을 필요에 따라 추가 */

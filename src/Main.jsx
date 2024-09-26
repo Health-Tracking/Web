@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import { PatientContext } from './App';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
+import './index.css'; // 커스텀 스타일 추가
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
@@ -13,12 +14,12 @@ const Main = () => {
     }
 
     return (
-        <div className="layout-content-container flex flex-col max-w-[960px] flex-1">
+        <div className="layout-content-container flex flex-col flex-1 p-4">
             <PatientHeader patient={selectedPatient} />
             <PatientInfo patient={selectedPatient} />
+            <Vitals patient={selectedPatient} />
             <MedicalHistory patient={selectedPatient} />
             <Medications patient={selectedPatient} />
-            <Vitals patient={selectedPatient} />
             <LabResults patient={selectedPatient} />
         </div>
     );
@@ -27,7 +28,7 @@ const Main = () => {
 const PatientHeader = ({ patient }) => {
     return (
         <div className="flex flex-wrap justify-between gap-3 p-4">
-            <p className="text-[#141414] tracking-light text-[32px] font-bold leading-tight min-w-72">{patient.name}</p>
+            <p className="text-[32px] tracking-light font-bold leading-tight min-w-72">{patient.name}</p>
         </div>
     );
 };
@@ -177,3 +178,4 @@ const LabResultItem = ({ icon, name, lastChecked }) => (
 );
 
 export default Main;
+
