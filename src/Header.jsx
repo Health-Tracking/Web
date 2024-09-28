@@ -1,8 +1,19 @@
 import React, { useContext } from 'react';
 import { PatientContext } from './App';
+import { auth } from './firebase';
+import { signOut } from 'firebase/auth';
 
 const Header = () => {
     const { selectedPatient } = useContext(PatientContext);
+
+    const handleLogout = async () => {
+        try {
+            await signOut(auth);
+            // 로그아웃 후 필요한 추가 작업을 여기에 추가할 수 있습니다.
+        } catch (error) {
+            console.error("로그아웃 중 오류 발생:", error);
+        }
+    };
 
     return (
         <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#F4F4F4] px-10 py-3">
@@ -14,21 +25,19 @@ const Header = () => {
                 </div>
                 <h2 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em]">Health Tracking</h2>
             </div>
-            <div className="flex flex-1 justify-end gap-8">
-                <div className="flex items-center gap-9">
-                    <a className="text-[#141414] text-sm font-medium leading-normal" href="#">Home</a>
-                    <a className="text-[#141414] text-sm font-medium leading-normal" href="#">Patients</a>
-                    <a className="text-[#141414] text-sm font-medium leading-normal" href="#">Medications</a>
-                    {selectedPatient && (
-                        <a className="text-[#141414] text-sm font-medium leading-normal" href="#">Messages</a>
-                    )}
-                </div>
-                <button className="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded h-10 bg-[#F4F4F4] text-[#141414] gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
-                        <path d="M221.8,175.94C216.25,166.38,208,139.33,208,104a80,80,0,1,0-160,0c0,35.34-8.26,62.38-13.81,71.94A16,16,0,0,0,48,200H88.81a40,40,0,0,0,78.38,0H208a16,16,0,0,0,13.8-24.06ZM128,216a24,24,0,0,1-22.62-16h45.24A24,24,0,0,1,128,216ZM48,184c7.7-13.24,16-43.92,16-80a64,64,0,1,1,128,0c0,36.05,8.28,66.73,16,80Z"></path>
-                    </svg>
+            <div className="flex items-center gap-9">
+                <a className="text-[#141414] text-sm font-medium leading-normal" href="#">Home</a>
+                <a className="text-[#141414] text-sm font-medium leading-normal" href="#">Patients</a>
+                <a className="text-[#141414] text-sm font-medium leading-normal" href="#">Medications</a>
+                {selectedPatient && (
+                    <a className="text-[#141414] text-sm font-medium leading-normal" href="#">Messages</a>
+                )}
+                <button
+                    onClick={handleLogout}
+                    className="text-[#141414] text-sm font-medium leading-normal"
+                >
+                    Logout
                 </button>
-                <div className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" style={{ backgroundImage: 'url("https://cdn.usegalileo.ai/stability/4da7ba2d-59ca-416b-96cc-9c3ea5851c26.png")' }}></div>
             </div>
         </header>
     );
