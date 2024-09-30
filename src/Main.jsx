@@ -3,6 +3,8 @@ import { PatientContext } from './App';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
 import './index.css'; // 커스텀 스타일 추가
+import DatePicker from 'react-datepicker';
+import "react-datepicker/dist/react-datepicker.css";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
@@ -43,7 +45,7 @@ const Main = () => {
                 setEditedPatient={setEditedPatient}
             />
             <PatientInfo patient={editedPatient} isEditing={isEditing} setEditedPatient={setEditedPatient} />
-            <Vitals patient={editedPatient} />
+            <Vitals patient={editedPatient} setEditedPatient={setEditedPatient} updatePatientInFirestore={updatePatientInFirestore} />
             <MedicalHistory patient={editedPatient} isEditing={isEditing} setEditedPatient={setEditedPatient} />
             <Medications patient={editedPatient} isEditing={isEditing} setEditedPatient={setEditedPatient} />
             <LabResults patient={editedPatient} isEditing={isEditing} setEditedPatient={setEditedPatient} />
@@ -116,7 +118,29 @@ const InfoItem = ({ label, value, field, isEditing, onChange }) => (
     </div>
 );
 
+const SectionHeader = ({ title, onAdd, onDelete }) => (
+    <div className="flex items-center justify-between px-4 pb-2 pt-4">
+        <h3 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em]">{title}</h3>
+        <div className="flex gap-2">
+            <button
+                className="text-gray-500 rounded text-sm font-medium leading-normal"
+                onClick={onAdd}
+            >
+                추가
+            </button>
+            <button
+                className="text-gray-500 rounded text-sm font-medium leading-normal"
+                onClick={onDelete}
+            >
+                삭제
+            </button>
+        </div>
+    </div>
+);
+
 const MedicalHistory = ({ patient, isEditing, setEditedPatient }) => {
+    const [checkedItems, setCheckedItems] = useState({});
+
     const handleChange = (index, field, value) => {
         setEditedPatient(prev => ({
             ...prev,
@@ -126,20 +150,53 @@ const MedicalHistory = ({ patient, isEditing, setEditedPatient }) => {
         }));
     };
 
+    const handleAdd = () => {
+        // 새로운 의료 기록 추가 로직
+        setEditedPatient(prev => ({
+            ...prev,
+            medicalHistory: [...(prev.medicalHistory || []), { title: '정보 없음', description: '정보 없음' }]
+        }));
+    };
+
+    const handleDelete = () => {
+        setEditedPatient(prev => ({
+            ...prev,
+            medicalHistory: prev.medicalHistory.filter((_, index) => !checkedItems[index])
+        }));
+        setCheckedItems({});
+    };
+
+    const handleCheck = (index) => {
+        setCheckedItems(prev => ({ ...prev, [index]: !prev[index] }));
+    };
+
     return (
         <>
-            <h3 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">의료 기록</h3>
+            <SectionHeader title="의료 기록" onAdd={handleAdd} onDelete={handleDelete} />
             {patient?.medicalHistory?.map((history, index) => (
-                <HistoryItem key={index} icon={history.icon} title={history.title} description={history.description} isEditing={isEditing} onChange={(field, value) => handleChange(index, field, value)} />
+                <HistoryItem
+                    key={index}
+                    isChecked={checkedItems[index]}
+                    onCheck={() => handleCheck(index)}
+                    title={history.title}
+                    description={history.description}
+                    isEditing={isEditing}
+                    onChange={(field, value) => handleChange(index, field, value)}
+                />
             ))}
         </>
     );
 };
 
-const HistoryItem = ({ icon, title, description, isEditing, onChange }) => (
+const HistoryItem = ({ isChecked, onCheck, title, description, isEditing, onChange }) => (
     <div className="flex items-center gap-4 bg-[#FFFFFF] px-4 min-h-[72px] py-2">
-        <div className="text-[#141414] flex items-center justify-center rounded bg-[#F4F4F4] shrink-0 size-12">
-            {/* 아이콘 컴포넌트 추가 필요 */}
+        <div className="flex items-center justify-center shrink-0 size-12">
+            <input
+                type="checkbox"
+                checked={isChecked}
+                onChange={onCheck}
+                className="w-5 h-5"
+            />
         </div>
         <div className="flex flex-col justify-center w-full">
             {isEditing ? (
@@ -168,20 +225,63 @@ const HistoryItem = ({ icon, title, description, isEditing, onChange }) => (
 );
 
 const Medications = ({ patient, isEditing, setEditedPatient }) => {
+    const [checkedItems, setCheckedItems] = useState({});
+
+    const handleChange = (index, field, value) => {
+        setEditedPatient(prev => ({
+            ...prev,
+            medications: prev.medications.map((item, i) =>
+                i === index ? { ...item, [field]: value } : item
+            )
+        }));
+    };
+
+    const handleAdd = () => {
+        setEditedPatient(prev => ({
+            ...prev,
+            medications: [...(prev.medications || []), { name: '', instruction: '' }]
+        }));
+    };
+
+    const handleDelete = () => {
+        setEditedPatient(prev => ({
+            ...prev,
+            medications: prev.medications.filter((_, index) => !checkedItems[index])
+        }));
+        setCheckedItems({});
+    };
+
+    const handleCheck = (index) => {
+        setCheckedItems(prev => ({ ...prev, [index]: !prev[index] }));
+    };
+
     return (
         <>
-            <h3 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">약물</h3>
+            <SectionHeader title="처방 내역" onAdd={handleAdd} onDelete={handleDelete} />
             {patient?.medications?.map((medication, index) => (
-                <MedicationItem key={index} icon={medication.icon} name={medication.name || '정보 없음'} instruction={medication.instruction || '정보 없음'} />
+                <MedicationItem
+                    key={index}
+                    isChecked={checkedItems[index]}
+                    onCheck={() => handleCheck(index)}
+                    name={medication.name}
+                    instruction={medication.instruction}
+                    isEditing={isEditing}
+                    onChange={(field, value) => handleChange(index, field, value)}
+                />
             ))}
         </>
     );
 };
 
-const MedicationItem = ({ icon, name, instruction, isEditing, onChange }) => (
+const MedicationItem = ({ isChecked, onCheck, name, instruction, isEditing, onChange }) => (
     <div className="flex items-center gap-4 bg-[#FFFFFF] px-4 min-h-[72px] py-2">
-        <div className="text-[#141414] flex items-center justify-center rounded bg-[#F4F4F4] shrink-0 size-12">
-            {/* 아이콘 컴포넌트 추가 필요 */}
+        <div className="flex items-center justify-center shrink-0 size-12">
+            <input
+                type="checkbox"
+                checked={isChecked}
+                onChange={onCheck}
+                className="w-5 h-5"
+            />
         </div>
         <div className="flex flex-col justify-center w-full">
             {isEditing ? (
@@ -209,61 +309,197 @@ const MedicationItem = ({ icon, name, instruction, isEditing, onChange }) => (
     </div>
 );
 
-const Vitals = ({ patient }) => {
+const Vitals = ({ patient, setEditedPatient, updatePatientInFirestore }) => {
+    const [isEditing, setIsEditing] = useState(false);
+    const [selectedVital, setSelectedVital] = useState(null);
+    const [selectedDate, setSelectedDate] = useState(null);
+    const [newValue, setNewValue] = useState('');
+    const vitalNames = ['산소포화도', '혈당', '혈압'];
+
+    const handleEdit = () => {
+        setIsEditing(!isEditing);
+        setSelectedVital(null);
+        setSelectedDate(null);
+        setNewValue('');
+    };
+
+    const handleVitalClick = (index) => {
+        if (isEditing) {
+            setSelectedVital(index);
+        }
+    };
+
+    const handleDateSelect = (date) => {
+        setSelectedDate(date);
+    };
+
+    const handleValueChange = (e) => {
+        setNewValue(e.target.value);
+    };
+
+    const handleSave = async () => {
+        if (selectedVital !== null && selectedDate && newValue) {
+            const updatedVitals = [...patient.vitals];
+            const vitalIndex = selectedVital;
+            const dateString = new Date(selectedDate.getTime() - (selectedDate.getTimezoneOffset() * 60000))
+                .toISOString().split('T')[0];
+
+            if (!updatedVitals[vitalIndex].data) {
+                updatedVitals[vitalIndex].data = {};
+            }
+
+            if (updatedVitals[vitalIndex].title === "혈압") {
+                // 혈압의 경우 [수축기, 이완기] 형태로 저장
+                const [systolic, diastolic] = newValue.split('/').map(v => parseFloat(v.trim()));
+                updatedVitals[vitalIndex].data[dateString] = [systolic, diastolic];
+            } else {
+                updatedVitals[vitalIndex].data[dateString] = parseFloat(newValue);
+            }
+
+            const updatedPatient = {
+                ...patient,
+                vitals: updatedVitals
+            };
+
+            await updatePatientInFirestore(updatedPatient);
+            setEditedPatient(updatedPatient);
+            setIsEditing(false);
+            setSelectedVital(null);
+            setSelectedDate(null);
+            setNewValue('');
+        }
+    };
+
     return (
         <>
-            <h3 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">생체 신호</h3>
+            <div className="flex items-center justify-between px-4 pb-2 pt-4">
+                <h3 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em]">생체 신호</h3>
+                <button
+                    className="text-gray-500 rounded text-sm font-medium leading-normal"
+                    onClick={handleEdit}
+                >
+                    {isEditing ? '저장' : '수정'}
+                </button>
+            </div>
             <div className="flex flex-wrap gap-4 px-4 py-6">
                 {patient?.vitals?.map((vital, index) => (
-                    <VitalChart key={index} title={vital.title} change={vital.change} data={vital.data} />
+                    <VitalChart
+                        key={index}
+                        title={vitalNames[index % 3]}
+                        data={vital.data}
+                        isEditing={isEditing}
+                        isSelected={selectedVital === index}
+                        onClick={() => handleVitalClick(index)}
+                    />
                 ))}
             </div>
+            {isEditing && selectedVital !== null && (
+                <div className="px-4 py-2">
+                    <DatePicker
+                        selected={selectedDate}
+                        onChange={handleDateSelect}
+                        inline
+                    />
+                    {selectedDate && (
+                        <div className="mt-2">
+                            <input
+                                type="text"
+                                value={newValue}
+                                onChange={handleValueChange}
+                                className="border rounded px-2 py-1"
+                            />
+                            <button
+                                onClick={handleSave}
+                                className="ml-2 bg-blue-500 text-white px-3 py-1 rounded"
+                            >
+                                저장
+                            </button>
+                        </div>
+                    )}
+                </div>
+            )}
         </>
     );
 };
 
-const VitalChart = ({ title, change, data }) => {
-    const today = new Date();
-    const labels = Array.from({ length: 5 }, (_, index) => {
-        const date = new Date(today);
-        date.setDate(today.getDate() - (4 - index)); // 오늘 날짜에서 0, 1, 2, 3, 4일 전
-        return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }); // 월과 일만 표시
-    });
+const VitalChart = ({ title, data, isEditing, isSelected, onClick }) => {
+    const sortedDates = Object.keys(data || {}).sort();
+    const latestFiveData = sortedDates.slice(-5);
 
-    const chartData = {
-        labels: labels,
-        datasets: [
-            {
+    let chartData;
+    let options;
+
+    if (title === "혈압") {
+        const filteredDates = latestFiveData.filter(date => date !== '0' && date !== '1');
+        chartData = {
+            labels: filteredDates,
+            datasets: [
+                {
+                    label: '수축기',
+                    data: filteredDates.map(date => data[date] ? data[date][0] : null),
+                    borderColor: 'rgb(255, 99, 132)',
+                    fill: false,
+                },
+                {
+                    label: '이완기',
+                    data: filteredDates.map(date => data[date] ? data[date][1] : null),
+                    borderColor: 'rgb(54, 162, 235)',
+                    fill: false,
+                }
+            ]
+        };
+        options = {
+            responsive: true,
+            plugins: {
+                legend: { display: true },
+                title: { display: false, text: title },
+            },
+            scales: {
+                x: {
+                    type: 'category',
+                    position: 'bottom',
+                },
+                y: {
+                    beginAtZero: true,
+                    // max: 200,
+                    ticks: { stepSize: 40 }
+                },
+            },
+        };
+    } else {
+        chartData = {
+            labels: latestFiveData,
+            datasets: [{
                 label: title,
-                data: data || [65, 59, 80, 81, 56], // 데이터가 없으면 기본값 용
-                fill: false,
+                data: latestFiveData.map(date => data[date]),
                 borderColor: 'rgb(75, 192, 192)',
-                tension: 0.1
-            }
-        ]
-    };
-
-    const options = {
-        responsive: true,
-        plugins: {
-            legend: {
-                display: false,
+                fill: false,
+            }]
+        };
+        options = {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                title: { display: false, text: title },
             },
-            title: {
-                display: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    // max: title === "혈당" ? 300 : 100,
+                    ticks: {
+                        stepSize: title === "혈당" ? 50 : 20
+                    }
+                },
             },
-        },
-        scales: {
-            y: {
-                beginAtZero: true,
-            },
-        },
-    };
+        };
+    }
 
     return (
-        <div className="flex min-w-72 flex-1 flex-col gap-2 rounded border border-[#E0E0E0] p-6">
+        <div
+            className={`flex min-w-72 flex-1 flex-col gap-2 rounded border border-[#E0E0E0] p-6 ${isEditing ? 'cursor-pointer' : ''} ${isSelected ? 'border-blue-500' : ''}`}
+            onClick={onClick}
+        >
             <p className="text-[#141414] text-base font-medium leading-normal">{title}</p>
-            <p className={`text-base font-medium leading-normal ${change.startsWith('+') ? 'text-[#189A4A]' : 'text-[#C3222A]'}`}>{change}</p>
             <div className="flex min-h-[180px] flex-1 flex-col gap-8 py-4">
                 <Line data={chartData} options={options} />
             </div>
@@ -272,20 +508,63 @@ const VitalChart = ({ title, change, data }) => {
 };
 
 const LabResults = ({ patient, isEditing, setEditedPatient }) => {
+    const [checkedItems, setCheckedItems] = useState({});
+
+    const handleChange = (index, field, value) => {
+        setEditedPatient(prev => ({
+            ...prev,
+            labResults: prev.labResults.map((item, i) =>
+                i === index ? { ...item, [field]: value } : item
+            )
+        }));
+    };
+
+    const handleAdd = () => {
+        setEditedPatient(prev => ({
+            ...prev,
+            labResults: [...(prev.labResults || []), { name: '', lastChecked: '' }]
+        }));
+    };
+
+    const handleDelete = () => {
+        setEditedPatient(prev => ({
+            ...prev,
+            labResults: prev.labResults.filter((_, index) => !checkedItems[index])
+        }));
+        setCheckedItems({});
+    };
+
+    const handleCheck = (index) => {
+        setCheckedItems(prev => ({ ...prev, [index]: !prev[index] }));
+    };
+
     return (
         <>
-            <h3 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">검사 결과</h3>
+            <SectionHeader title="검사 결과" onAdd={handleAdd} onDelete={handleDelete} />
             {patient?.labResults?.map((result, index) => (
-                <LabResultItem key={index} icon={result.icon} name={result.name} lastChecked={result.lastChecked} />
+                <LabResultItem
+                    key={index}
+                    isChecked={checkedItems[index]}
+                    onCheck={() => handleCheck(index)}
+                    name={result.name}
+                    lastChecked={result.lastChecked}
+                    isEditing={isEditing}
+                    onChange={(field, value) => handleChange(index, field, value)}
+                />
             ))}
         </>
     );
 };
 
-const LabResultItem = ({ icon, name, lastChecked, isEditing, onChange }) => (
+const LabResultItem = ({ isChecked, onCheck, name, lastChecked, isEditing, onChange }) => (
     <div className="flex items-center gap-4 bg-[#FFFFFF] px-4 min-h-[72px] py-2">
-        <div className="text-[#141414] flex items-center justify-center rounded bg-[#F4F4F4] shrink-0 size-12">
-            {/* 아이콘 컴포넌트 추가 필요 */}
+        <div className="flex items-center justify-center shrink-0 size-12">
+            <input
+                type="checkbox"
+                checked={isChecked}
+                onChange={onCheck}
+                className="w-5 h-5"
+            />
         </div>
         <div className="flex flex-col justify-center w-full">
             {isEditing ? (

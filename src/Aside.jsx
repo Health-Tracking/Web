@@ -26,15 +26,16 @@ const Aside = () => {
                 { icon: "정보 없음", name: "정보 없음", instruction: "정보 없음" }
             ],
             vitals: [
-                { title: "", change: "", data: [] },
-                { title: "", change: "", data: [] },
-                { title: "", change: "", data: [] }
+                { title: "산소 포화도", data: {} },
+                { title: "혈당", data: {} },
+                { title: "혈압", data: {} }  //{ '날짜': [수축기, 이완기] } 형태로 저장
             ],
             labResults: [
                 { icon: "정보 없음", name: "정보 없음", lastChecked: "정보 없음" },
                 { icon: "정보 없음", name: "정보 없음", lastChecked: "정보 없음" }
             ]
         };
+
 
         try {
             const docRef = await addDoc(collection(db, `users/${user.uid}/patients`), newPatient);

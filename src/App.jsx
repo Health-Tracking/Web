@@ -74,9 +74,9 @@ const App = () => {
         { icon: "정보 없음", name: "정보 없음", instruction: "정보 없음" }
       ],
       vitals: [
-        { title: "", change: "", data: [] },
-        { title: "", change: "", data: [] },
-        { title: "", change: "", data: [] }
+        { title: "산소 포화도", data: {} },
+        { title: "혈당", data: {} },
+        { title: "혈압", data: {} }
       ],
       labResults: [
         { icon: "정보 없음", name: "정보 없음", lastChecked: "정보 없음" },
