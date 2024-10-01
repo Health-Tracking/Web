@@ -5,6 +5,8 @@ import Header from './Header';
 import Aside from './Aside';
 import Main from './Main';
 import Login from './Login';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import Messages from './Messages';
 
 export const PatientContext = React.createContext();
 
@@ -81,7 +83,20 @@ const App = () => {
       labResults: [
         { icon: "정보 없음", name: "정보 없음", lastChecked: "정보 없음" },
         { icon: "정보 없음", name: "정보 없음", lastChecked: "정보 없음" }
-      ]
+      ],
+      messages: [],
+      lastMessageTimestamp: null,
+      unreadMessageCount: 0
+      // messages: 환자와의 메시지 기록을 저장하는 배열입니다. 각 메시지 객체는 다음과 같은 구조를 가질 수 있습니다:
+      // lastMessageTimestamp: 가장 최근 메시지의 타임스탬프를 저장합니다. 이를 통해 메시지 목록을 정렬하거나 최신 메시지를 빠르게 확인할 수 있습니다.
+      // unreadMessageCount: 읽지 않은 메시지의 수를 저장합니다. 이를 통해 UI에서 새 메시지 알림을 표시할 수 있습니다.
+      // {
+      //   id: "unique_message_id",
+      //   sender: "doctor" | "patient",
+      //   content: "메시지 내용",
+      //   timestamp: Firebase.firestore.Timestamp.now(),
+      //   read: false
+      // }
     };
 
     try {
@@ -107,26 +122,33 @@ const App = () => {
   }
 
   return (
-    <PatientContext.Provider value={{
-      patients,
-      selectedPatient,
-      setSelectedPatient,
-      searchTerm,
-      setSearchTerm,
-      setPatients,
-      user,
-      updatePatientInFirestore
-    }}>
-      <div className="relative flex size-full min-h-screen flex-col bg-[#FFFFFF] group/design-root overflow-x-hidden" style={{ fontFamily: 'Inter, "Noto Sans", sans-serif' }}>
-        <div className="layout-container flex h-full grow flex-col">
-          <Header />
-          <div className="gap-1 px-6 flex flex-1 justify-center py-5">
-            <Aside />
-            <Main />
-          </div>
+    <Router>
+      <PatientContext.Provider value={{
+        patients,
+        selectedPatient,
+        setSelectedPatient,
+        searchTerm,
+        setSearchTerm,
+        setPatients,
+        user,
+        updatePatientInFirestore
+      }}>
+        <div className="relative flex size-full min-h-screen flex-col bg-[#FFFFFF] group/design-root overflow-x-hidden" style={{ fontFamily: 'Inter, "Noto Sans", sans-serif' }}>
+          <Routes>
+            <Route path="/" element={
+              <div className="layout-container flex h-full grow flex-col">
+                <Header />
+                <div className="gap-1 px-6 flex flex-1 justify-center py-5">
+                  <Aside />
+                  <Main />
+                </div>
+              </div>
+            } />
+            <Route path="/messages" element={<Messages />} />
+          </Routes>
         </div>
-      </div>
-    </PatientContext.Provider>
+      </PatientContext.Provider>
+    </Router>
   );
 };
 

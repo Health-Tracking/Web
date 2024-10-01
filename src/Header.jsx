@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import { PatientContext } from './App';
 import { auth } from './firebase';
 import { signOut } from 'firebase/auth';
+import { Link } from 'react-router-dom';
 
 const Header = () => {
     const { selectedPatient } = useContext(PatientContext);
@@ -26,11 +27,11 @@ const Header = () => {
                 <h2 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em]">Health Tracking</h2>
             </div>
             <div className="flex items-center gap-9">
-                <a className="text-[#141414] text-sm font-medium leading-normal" href="#">Home</a>
+                <Link to="/" className="text-[#141414] text-sm font-medium leading-normal">Home</Link>
                 <a className="text-[#141414] text-sm font-medium leading-normal" href="#">Patients</a>
                 <a className="text-[#141414] text-sm font-medium leading-normal" href="#">Medications</a>
                 {selectedPatient && (
-                    <a className="text-[#141414] text-sm font-medium leading-normal" href="#">Messages</a>
+                    <Link to="/messages" className="text-[#141414] text-sm font-medium leading-normal">Messages</Link>
                 )}
                 <button
                     onClick={handleLogout}

@@ -33,7 +33,10 @@ const Aside = () => {
             labResults: [
                 { icon: "정보 없음", name: "정보 없음", lastChecked: "정보 없음" },
                 { icon: "정보 없음", name: "정보 없음", lastChecked: "정보 없음" }
-            ]
+            ],
+            messages: [],
+            lastMessageTimestamp: null,
+            unreadMessageCount: 0
         };
 
 
@@ -64,7 +67,7 @@ const Aside = () => {
             <div className="w-full px-4">
                 <button onClick={addPatient} className="mb-4 p-2 bg-blue-500 text-white rounded w-full">환자 추가</button>
             </div>
-            <div className='overflow-y-auto h-[calc(100vh-)]'>
+            <div className='overflow-y-auto h-[calc(100vh-50px)]'>
                 <PatientList />
             </div>
 
