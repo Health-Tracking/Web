@@ -31,4 +31,24 @@
     }
 }
 
-/* 추가적인 반응형 스타일을 필요에 따라 추가 */
+.react-datepicker {
+    width: 100%;
+}
+
+.react-datepicker__month-container {
+    width: 100%;
+}
+
+.react-datepicker__month {
+    width: 100%;
+}
+
+.react-datepicker__week {
+    display: flex;
+    justify-content: space-between;
+}
+
+.react-datepicker__day {
+    flex: 1;
+    text-align: center;
+}

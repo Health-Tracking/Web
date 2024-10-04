@@ -7,6 +7,7 @@ import Main from './Main';
 import Login from './Login';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Messages from './Messages';
+import Medications from './Medications';  // Medications 컴포넌트 임포트
 
 export const PatientContext = React.createContext();
 
@@ -145,6 +146,7 @@ const App = () => {
               </div>
             } />
             <Route path="/messages" element={<Messages />} />
+            <Route path="/medications" element={<Medications />} />
           </Routes>
         </div>
       </PatientContext.Provider>
