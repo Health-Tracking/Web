@@ -46,9 +46,77 @@
 .react-datepicker__week {
     display: flex;
     justify-content: space-between;
+    width: 99%;
 }
 
 .react-datepicker__day {
     flex: 1;
     text-align: center;
+    margin: 0.2rem;
+}
+
+.medical-calendar .react-datepicker {
+    width: 100%;
+    padding: 0;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.medical-calendar .react-datepicker__month-container {
+    width: 100%;
+    float: none;
+}
+
+.medical-calendar .react-datepicker__header {
+    background-color: #f0f0f0;
+    border-bottom: 1px solid #e0e0e0;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    padding-top: 10px;
+}
+
+.medical-calendar .react-datepicker__day-names,
+.medical-calendar .react-datepicker__week {
+    display: flex;
+    justify-content: space-around;
+    margin: 0;
+}
+
+.medical-calendar .react-datepicker__day-name,
+.medical-calendar .react-datepicker__day {
+    flex: 1;
+    margin: 0;
+    padding: 0.5rem 0;
+    width: calc(100% / 7);
+    text-align: center;
+    line-height: 1.7;
+}
+
+.medical-calendar .react-datepicker__month {
+    margin: 0;
+    padding: 0.5rem 0;
+}
+
+.medical-calendar .react-datepicker__day--selected {
+    background-color: #3498db;
+    color: white;
+}
+
+.medical-calendar .react-datepicker__day:hover {
+    background-color: #e8f4fd;
+}
+
+.medical-calendar .react-datepicker__navigation {
+    top: 15px;
+}
+
+.medical-calendar .react-datepicker__navigation--previous {
+    left: 10px;
+    border-right-color: #ccc;
+}
+
+.medical-calendar .react-datepicker__navigation--next {
+    right: 10px;
+    border-left-color: #ccc;
 }
