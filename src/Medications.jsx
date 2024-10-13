@@ -5,6 +5,7 @@ import { PatientContext } from './App';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import './index.css';
+
 const Medications = () => {
     const { selectedPatient } = useContext(PatientContext);
     const [selectedDate, setSelectedDate] = useState(new Date());
@@ -31,12 +32,12 @@ const Medications = () => {
                 <Aside />
                 <main className="flex-1 p-6">
                     <div className="flex">
-                        <div className="w-1/2 pr-4">
+                        <div className="w-1/2 h-full ">
                             <DatePicker
                                 selected={selectedDate}
                                 onChange={handleDateChange}
                                 inline
-                                className="w-full"
+                                className="w-full medical-calendar"
                                 calendarClassName="w-full"
                             />
                         </div>
