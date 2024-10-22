@@ -5,7 +5,7 @@ import { signOut } from 'firebase/auth';
 import { Link } from 'react-router-dom';
 
 const Header = () => {
-    const { selectedPatient } = useContext(PatientContext);
+    const { selectedPatient, user } = useContext(PatientContext);
 
     const handleLogout = async () => {
         try {
@@ -32,6 +32,7 @@ const Header = () => {
                 {selectedPatient && (
                     <Link to="/messages" className="text-[#141414] text-sm font-medium leading-normal">Messages</Link>
                 )}
+                <Link to={`/settings/${user?.uid}`} className="text-[#141414] text-sm font-medium leading-normal">Settings</Link>
                 <button
                     onClick={handleLogout}
                     className="text-[#141414] text-sm font-medium leading-normal"

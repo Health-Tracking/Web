@@ -86,8 +86,33 @@ const PatientHeader = ({ patient, isEditing, setIsEditing, handleSave, setEdited
 
 const PatientInfo = ({ patient, isEditing, setEditedPatient }) => {
     const handleChange = (field, value) => {
-        setEditedPatient(prev => ({ ...prev, [field]: value }));
+        setEditedPatient(prev => {
+            const updatedPatient = { ...prev, [field]: value };
+            // BMI 자동 계산
+            if (field === 'height' || field === 'weight') {
+                const height = field === 'height' ? parseFloat(value) : parseFloat(prev.height);
+                const weight = field === 'weight' ? parseFloat(value) : parseFloat(prev.weight);
+                if (height && weight) {
+                    const heightInMeters = height / 100;
+                    const bmi = (weight / (heightInMeters * heightInMeters)).toFixed(2);
+                    updatedPatient.bmi = bmi;
+                }
+            }
+            return updatedPatient;
+        });
     };
+
+    // BMI 계산 함수
+    const calculateBMI = (height, weight) => {
+        if (height && weight) {
+            const heightInMeters = height / 100;
+            return (weight / (heightInMeters * heightInMeters)).toFixed(2);
+        }
+        return '';
+    };
+
+    // BMI 값 계산
+    const bmiValue = calculateBMI(patient?.height, patient?.weight);
 
     return (
         <div className="p-4 grid grid-cols-[20%_1fr] gap-x-6">
@@ -95,7 +120,7 @@ const PatientInfo = ({ patient, isEditing, setEditedPatient }) => {
             <InfoItem label="나이" value={patient?.age} field="age" isEditing={isEditing} onChange={handleChange} />
             <InfoItem label="키" value={patient?.height} field="height" isEditing={isEditing} onChange={handleChange} />
             <InfoItem label="체중" value={patient?.weight} field="weight" isEditing={isEditing} onChange={handleChange} />
-            <InfoItem label="BMI" value={patient?.bmi} field="bmi" isEditing={isEditing} onChange={handleChange} />
+            <InfoItem label="BMI" value={bmiValue} field="bmi" isEditing={false} onChange={handleChange} />
             <InfoItem label="혈액형" value={patient?.bloodType} field="bloodType" isEditing={isEditing} onChange={handleChange} />
         </div>
     );

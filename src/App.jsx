@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { auth, db } from './firebase';
-import { collection, getDocs, addDoc, doc, updateDoc } from 'firebase/firestore';
+import { collection, getDocs, addDoc, doc, updateDoc, setDoc } from 'firebase/firestore';
 import Header from './Header';
 import Aside from './Aside';
 import Main from './Main';
@@ -8,7 +8,7 @@ import Login from './Login';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Messages from './Messages';
 import Medications from './Medications';  // Medications 컴포넌트 임포트
-
+import Settings from './Settings';
 export const PatientContext = React.createContext();
 
 const App = () => {
@@ -22,11 +22,11 @@ const App = () => {
   const updatePatientInFirestore = async (updatedPatient) => {
     if (!user) return;
     try {
-      const patientRef = doc(db, `users/${user.uid}/patients`, updatedPatient.id);
+      const patientRef = doc(db, 'patients', updatedPatient.id);
       await updateDoc(patientRef, updatedPatient);
-      console.log("Patient updated successfully in Firestore");
+      console.log("환자 정보가 Firestore에 성공적으로 업데이트되었습니다");
     } catch (error) {
-      console.error("Error updating patient in Firestore:", error);
+      console.error("Firestore에서 환자 정보 업데이트 중 오류 발생:", error);
     }
   };
 
@@ -34,6 +34,10 @@ const App = () => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       setUser(user);
       if (user) {
+        // 의사 정보를 doctors 컬렉션에 저장
+        const doctorRef = doc(db, 'doctors', user.uid);
+        await setDoc(doctorRef, { name: user.displayName, email: user.email }, { merge: true });
+
         await fetchPatientsAndCreateIfEmpty(user.uid);
         setIsLoggedIn(true);
       } else {
@@ -45,7 +49,7 @@ const App = () => {
   }, []);
 
   const fetchPatientsAndCreateIfEmpty = async (userId) => {
-    const querySnapshot = await getDocs(collection(db, `users/${userId}/patients`));
+    const querySnapshot = await getDocs(collection(db, 'patients'));
     let patientsData = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
 
     if (patientsData.length === 0) {
@@ -87,7 +91,8 @@ const App = () => {
       ],
       messages: [],
       lastMessageTimestamp: null,
-      unreadMessageCount: 0
+      unreadMessageCount: 0,
+      doctorId: userId // 환자를 생성한 의사의 ID를 저장
       // messages: 환자와의 메시지 기록을 저장하는 배열입니다. 각 메시지 객체는 다음과 같은 구조를 가질 수 있습니다:
       // lastMessageTimestamp: 가장 최근 메시지의 타임스탬프를 저장합니다. 이를 통해 메시지 목록을 정렬하거나 최신 메시지를 빠르게 확인할 수 있습니다.
       // unreadMessageCount: 읽지 않은 메시지의 수를 저장합니다. 이를 통해 UI에서 새 메시지 알림을 표시할 수 있습니다.
@@ -101,11 +106,11 @@ const App = () => {
     };
 
     try {
-      const docRef = await addDoc(collection(db, `users/${userId}/patients`), newPatient);
-      console.log("New patient created with ID: ", docRef.id);
+      const docRef = await addDoc(collection(db, 'patients'), newPatient);
+      console.log("새 환자가 생성되었습니다. ID: ", docRef.id);
       return { ...newPatient, id: docRef.id };
     } catch (e) {
-      console.error("Error creating new patient: ", e);
+      console.error("새 환자 생성 중 오류 발생: ", e);
       return null;
     }
   };
@@ -147,6 +152,7 @@ const App = () => {
             } />
             <Route path="/messages" element={<Messages />} />
             <Route path="/medications" element={<Medications />} />
+            <Route path="/settings/:userId" element={<Settings />} />
           </Routes>
         </div>
       </PatientContext.Provider>

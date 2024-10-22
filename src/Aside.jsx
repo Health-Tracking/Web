@@ -36,12 +36,12 @@ const Aside = () => {
             ],
             messages: [],
             lastMessageTimestamp: null,
-            unreadMessageCount: 0
+            unreadMessageCount: 0,
+            doctorId: user.uid // 환자를 생성한 의사의 ID를 저장
         };
 
-
         try {
-            const docRef = await addDoc(collection(db, `users/${user.uid}/patients`), newPatient);
+            const docRef = await addDoc(collection(db, `patients`), newPatient);
             console.log("Document written with ID: ", docRef.id);
             setPatients([{ ...newPatient, id: docRef.id }, ...patients]);
         } catch (e) {
