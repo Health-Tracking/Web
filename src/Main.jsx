@@ -44,11 +44,22 @@ const Main = () => {
                 handleSave={handleSave}
                 setEditedPatient={setEditedPatient}
             />
-            <PatientInfo patient={editedPatient} isEditing={isEditing} setEditedPatient={setEditedPatient} />
-            <Vitals patient={editedPatient} setEditedPatient={setEditedPatient} updatePatientInFirestore={updatePatientInFirestore} />
-            <MedicalHistory patient={editedPatient} isEditing={isEditing} setEditedPatient={setEditedPatient} />
-            <Medications patient={editedPatient} isEditing={isEditing} setEditedPatient={setEditedPatient} />
-            <LabResults patient={editedPatient} isEditing={isEditing} setEditedPatient={setEditedPatient} />
+            <div className="flex flex-1">
+                <div className="flex flex-col w-1/2 pr-2">
+                    <PatientInfo patient={editedPatient} isEditing={isEditing} setEditedPatient={setEditedPatient} />
+                    <MedicalHistory patient={editedPatient} isEditing={isEditing} setEditedPatient={setEditedPatient} />
+                    <Medications patient={editedPatient} isEditing={isEditing} setEditedPatient={setEditedPatient} />
+                    <LabResults patient={editedPatient} isEditing={isEditing} setEditedPatient={setEditedPatient} />
+                </div>
+                <div className="flex flex-col w-1/2 pl-2">
+                    <Vitals
+                        patient={editedPatient}
+                        setEditedPatient={setEditedPatient}
+                        updatePatientInFirestore={updatePatientInFirestore}
+                        isEditing={isEditing}
+                    />
+                </div>
+            </div>
         </div>
     );
 };
@@ -334,19 +345,11 @@ const MedicationItem = ({ isChecked, onCheck, name, instruction, isEditing, onCh
     </div>
 );
 
-const Vitals = ({ patient, setEditedPatient, updatePatientInFirestore }) => {
-    const [isEditing, setIsEditing] = useState(false);
+const Vitals = ({ patient, setEditedPatient, updatePatientInFirestore, isEditing }) => {
     const [selectedVital, setSelectedVital] = useState(null);
     const [selectedDate, setSelectedDate] = useState(null);
     const [newValue, setNewValue] = useState('');
     const vitalNames = ['산소포화도', '혈당', '혈압'];
-
-    const handleEdit = () => {
-        setIsEditing(!isEditing);
-        setSelectedVital(null);
-        setSelectedDate(null);
-        setNewValue('');
-    };
 
     const handleVitalClick = (index) => {
         if (isEditing) {
@@ -388,7 +391,6 @@ const Vitals = ({ patient, setEditedPatient, updatePatientInFirestore }) => {
 
             await updatePatientInFirestore(updatedPatient);
             setEditedPatient(updatedPatient);
-            setIsEditing(false);
             setSelectedVital(null);
             setSelectedDate(null);
             setNewValue('');
@@ -399,18 +401,12 @@ const Vitals = ({ patient, setEditedPatient, updatePatientInFirestore }) => {
         <>
             <div className="flex items-center justify-between px-4 pb-2 pt-4">
                 <h3 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em]">생체 신호</h3>
-                <button
-                    className="text-gray-500 rounded text-sm font-medium leading-normal"
-                    onClick={handleEdit}
-                >
-                    {isEditing ? '저장' : '수정'}
-                </button>
             </div>
-            <div className="flex flex-wrap gap-4 px-4 py-6">
+            <div className="flex flex-col gap-4 px-4 py-6">
                 {patient?.vitals?.map((vital, index) => (
                     <VitalChart
                         key={index}
-                        title={vitalNames[index % 3]}
+                        title={vitalNames[index]}
                         data={vital.data}
                         isEditing={isEditing}
                         isSelected={selectedVital === index}
@@ -475,6 +471,7 @@ const VitalChart = ({ title, data, isEditing, isSelected, onClick }) => {
         };
         options = {
             responsive: true,
+            maintainAspectRatio: false,
             plugins: {
                 legend: { display: true },
                 title: { display: false, text: title },
@@ -486,7 +483,6 @@ const VitalChart = ({ title, data, isEditing, isSelected, onClick }) => {
                 },
                 y: {
                     beginAtZero: true,
-                    // max: 200,
                     ticks: { stepSize: 40 }
                 },
             },
@@ -503,6 +499,7 @@ const VitalChart = ({ title, data, isEditing, isSelected, onClick }) => {
         };
         options = {
             responsive: true,
+            maintainAspectRatio: false,
             plugins: {
                 legend: { display: false },
                 title: { display: false, text: title },
@@ -510,7 +507,6 @@ const VitalChart = ({ title, data, isEditing, isSelected, onClick }) => {
             scales: {
                 y: {
                     beginAtZero: true,
-                    // max: title === "혈당" ? 300 : 100,
                     ticks: {
                         stepSize: title === "혈당" ? 50 : 20
                     }
@@ -521,7 +517,7 @@ const VitalChart = ({ title, data, isEditing, isSelected, onClick }) => {
 
     return (
         <div
-            className={`flex min-w-72 flex-1 flex-col gap-2 rounded border border-[#E0E0E0] p-6 ${isEditing ? 'cursor-pointer' : ''} ${isSelected ? 'border-blue-500' : ''}`}
+            className={`flex min-w-72 min-h-[90px] flex-1 flex-col gap-2 rounded border border-[#E0E0E0] p-6 ${isEditing ? 'cursor-pointer' : ''} ${isSelected ? 'border-blue-500' : ''}`}
             onClick={onClick}
         >
             <p className="text-[#141414] text-base font-medium leading-normal">{title}</p>
