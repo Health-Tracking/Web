@@ -28,7 +28,6 @@ const Header = () => {
             </div>
             <div className="flex items-center gap-9">
                 <Link to="/" className="text-[#141414] text-sm font-medium leading-normal">Home</Link>
-                <Link to="/medications" className="text-[#141414] text-sm font-medium leading-normal">Medications</Link>
                 {selectedPatient && (
                     <Link to="/messages" className="text-[#141414] text-sm font-medium leading-normal">Messages</Link>
                 )}

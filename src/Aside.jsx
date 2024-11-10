@@ -35,8 +35,6 @@ const Aside = () => {
                 { icon: "정보 없음", name: "정보 없음", lastChecked: "정보 없음" }
             ],
             messages: [],
-            lastMessageTimestamp: null,
-            unreadMessageCount: 0,
             doctorId: user.uid // 환자를 생성한 의사의 ID를 저장
         };
 

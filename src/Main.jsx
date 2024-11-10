@@ -5,6 +5,7 @@ import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement
 import './index.css'; // 커스텀 스타일 추가
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
+import Medications from './Medications';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
@@ -47,9 +48,7 @@ const Main = () => {
             <div className="flex flex-1">
                 <div className="flex flex-col w-1/2 pr-2">
                     <PatientInfo patient={editedPatient} isEditing={isEditing} setEditedPatient={setEditedPatient} />
-                    <MedicalHistory patient={editedPatient} isEditing={isEditing} setEditedPatient={setEditedPatient} />
-                    <Medications patient={editedPatient} isEditing={isEditing} setEditedPatient={setEditedPatient} />
-                    <LabResults patient={editedPatient} isEditing={isEditing} setEditedPatient={setEditedPatient} />
+                    <Medications />
                 </div>
                 <div className="flex flex-col w-1/2 pl-2">
                     <Vitals
@@ -174,177 +173,6 @@ const SectionHeader = ({ title, onAdd, onDelete }) => (
     </div>
 );
 
-const MedicalHistory = ({ patient, isEditing, setEditedPatient }) => {
-    const [checkedItems, setCheckedItems] = useState({});
-
-    const handleChange = (index, field, value) => {
-        setEditedPatient(prev => ({
-            ...prev,
-            medicalHistory: prev.medicalHistory.map((item, i) =>
-                i === index ? { ...item, [field]: value } : item
-            )
-        }));
-    };
-
-    const handleAdd = () => {
-        // 새로운 의료 기록 추가 로직
-        setEditedPatient(prev => ({
-            ...prev,
-            medicalHistory: [...(prev.medicalHistory || []), { title: '정보 없음', description: '정보 없음' }]
-        }));
-    };
-
-    const handleDelete = () => {
-        setEditedPatient(prev => ({
-            ...prev,
-            medicalHistory: prev.medicalHistory.filter((_, index) => !checkedItems[index])
-        }));
-        setCheckedItems({});
-    };
-
-    const handleCheck = (index) => {
-        setCheckedItems(prev => ({ ...prev, [index]: !prev[index] }));
-    };
-
-    return (
-        <>
-            <SectionHeader title="의료 기록" onAdd={handleAdd} onDelete={handleDelete} />
-            {patient?.medicalHistory?.map((history, index) => (
-                <HistoryItem
-                    key={index}
-                    isChecked={checkedItems[index]}
-                    onCheck={() => handleCheck(index)}
-                    title={history.title}
-                    description={history.description}
-                    isEditing={isEditing}
-                    onChange={(field, value) => handleChange(index, field, value)}
-                />
-            ))}
-        </>
-    );
-};
-
-const HistoryItem = ({ isChecked, onCheck, title, description, isEditing, onChange }) => (
-    <div className="flex items-center gap-4 bg-[#FFFFFF] px-4 min-h-[72px] py-2">
-        <div className="flex items-center justify-center shrink-0 size-12">
-            <input
-                type="checkbox"
-                checked={isChecked}
-                onChange={onCheck}
-                className="w-5 h-5"
-            />
-        </div>
-        <div className="flex flex-col justify-center w-full">
-            {isEditing ? (
-                <>
-                    <input
-                        type="text"
-                        value={title || ''}
-                        onChange={(e) => onChange('title', e.target.value)}
-                        className="text-[#141414] text-base font-medium leading-normal line-clamp-1 focus:outline-none px-2 py-1 rounded mb-1 border-none"
-                    />
-                    <input
-                        type="text"
-                        value={description || ''}
-                        onChange={(e) => onChange('description', e.target.value)}
-                        className="text-neutral-500 text-sm font-normal leading-normal line-clamp-2 focus:outline-none px-2 py-1 rounded border-none"
-                    />
-                </>
-            ) : (
-                <>
-                    <p className="text-[#141414] text-base font-medium leading-normal line-clamp-1">{title || '정보 없음'}</p>
-                    <p className="text-neutral-500 text-sm font-normal leading-normal line-clamp-2">{description || '정보 없음'}</p>
-                </>
-            )}
-        </div>
-    </div>
-);
-
-const Medications = ({ patient, isEditing, setEditedPatient }) => {
-    const [checkedItems, setCheckedItems] = useState({});
-
-    const handleChange = (index, field, value) => {
-        setEditedPatient(prev => ({
-            ...prev,
-            medications: prev.medications.map((item, i) =>
-                i === index ? { ...item, [field]: value } : item
-            )
-        }));
-    };
-
-    const handleAdd = () => {
-        setEditedPatient(prev => ({
-            ...prev,
-            medications: [...(prev.medications || []), { name: '', instruction: '' }]
-        }));
-    };
-
-    const handleDelete = () => {
-        setEditedPatient(prev => ({
-            ...prev,
-            medications: prev.medications.filter((_, index) => !checkedItems[index])
-        }));
-        setCheckedItems({});
-    };
-
-    const handleCheck = (index) => {
-        setCheckedItems(prev => ({ ...prev, [index]: !prev[index] }));
-    };
-
-    return (
-        <>
-            <SectionHeader title="처방 내역" onAdd={handleAdd} onDelete={handleDelete} />
-            {patient?.medications?.map((medication, index) => (
-                <MedicationItem
-                    key={index}
-                    isChecked={checkedItems[index]}
-                    onCheck={() => handleCheck(index)}
-                    name={medication.name}
-                    instruction={medication.instruction}
-                    isEditing={isEditing}
-                    onChange={(field, value) => handleChange(index, field, value)}
-                />
-            ))}
-        </>
-    );
-};
-
-const MedicationItem = ({ isChecked, onCheck, name, instruction, isEditing, onChange }) => (
-    <div className="flex items-center gap-4 bg-[#FFFFFF] px-4 min-h-[72px] py-2">
-        <div className="flex items-center justify-center shrink-0 size-12">
-            <input
-                type="checkbox"
-                checked={isChecked}
-                onChange={onCheck}
-                className="w-5 h-5"
-            />
-        </div>
-        <div className="flex flex-col justify-center w-full">
-            {isEditing ? (
-                <>
-                    <input
-                        type="text"
-                        value={name || ''}
-                        onChange={(e) => onChange('name', e.target.value)}
-                        className="text-[#141414] text-base font-medium leading-normal line-clamp-1 focus:outline-none px-2 py-1 rounded mb-1 border-none"
-                    />
-                    <input
-                        type="text"
-                        value={instruction || ''}
-                        onChange={(e) => onChange('instruction', e.target.value)}
-                        className="text-neutral-500 text-sm font-normal leading-normal line-clamp-2 focus:outline-none px-2 py-1 rounded border-none"
-                    />
-                </>
-            ) : (
-                <>
-                    <p className="text-[#141414] text-base font-medium leading-normal line-clamp-1">{name || '정보 없음'}</p>
-                    <p className="text-neutral-500 text-sm font-normal leading-normal line-clamp-2">{instruction || '정보 없음'}</p>
-                </>
-            )}
-        </div>
-    </div>
-);
-
 const Vitals = ({ patient, setEditedPatient, updatePatientInFirestore, isEditing }) => {
     const [selectedVital, setSelectedVital] = useState(null);
     const [selectedDate, setSelectedDate] = useState(null);
@@ -399,9 +227,7 @@ const Vitals = ({ patient, setEditedPatient, updatePatientInFirestore, isEditing
 
     return (
         <>
-            <div className="flex items-center justify-between px-4 pb-2 pt-4">
-                <h3 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em]">생체 신호</h3>
-            </div>
+
             <div className="flex flex-col gap-4 px-4 py-6">
                 {patient?.vitals?.map((vital, index) => (
                     <VitalChart
@@ -521,96 +347,11 @@ const VitalChart = ({ title, data, isEditing, isSelected, onClick }) => {
             onClick={onClick}
         >
             <p className="text-[#141414] text-base font-medium leading-normal">{title}</p>
-            <div className="flex min-h-[180px] flex-1 flex-col gap-8 py-4">
+            <div className="flex min-h-[90px] flex-1 flex-col gap-8 py-4">
                 <Line data={chartData} options={options} />
             </div>
         </div>
     );
 };
-
-const LabResults = ({ patient, isEditing, setEditedPatient }) => {
-    const [checkedItems, setCheckedItems] = useState({});
-
-    const handleChange = (index, field, value) => {
-        setEditedPatient(prev => ({
-            ...prev,
-            labResults: prev.labResults.map((item, i) =>
-                i === index ? { ...item, [field]: value } : item
-            )
-        }));
-    };
-
-    const handleAdd = () => {
-        setEditedPatient(prev => ({
-            ...prev,
-            labResults: [...(prev.labResults || []), { name: '', lastChecked: '' }]
-        }));
-    };
-
-    const handleDelete = () => {
-        setEditedPatient(prev => ({
-            ...prev,
-            labResults: prev.labResults.filter((_, index) => !checkedItems[index])
-        }));
-        setCheckedItems({});
-    };
-
-    const handleCheck = (index) => {
-        setCheckedItems(prev => ({ ...prev, [index]: !prev[index] }));
-    };
-
-    return (
-        <>
-            <SectionHeader title="검사 결과" onAdd={handleAdd} onDelete={handleDelete} />
-            {patient?.labResults?.map((result, index) => (
-                <LabResultItem
-                    key={index}
-                    isChecked={checkedItems[index]}
-                    onCheck={() => handleCheck(index)}
-                    name={result.name}
-                    lastChecked={result.lastChecked}
-                    isEditing={isEditing}
-                    onChange={(field, value) => handleChange(index, field, value)}
-                />
-            ))}
-        </>
-    );
-};
-
-const LabResultItem = ({ isChecked, onCheck, name, lastChecked, isEditing, onChange }) => (
-    <div className="flex items-center gap-4 bg-[#FFFFFF] px-4 min-h-[72px] py-2">
-        <div className="flex items-center justify-center shrink-0 size-12">
-            <input
-                type="checkbox"
-                checked={isChecked}
-                onChange={onCheck}
-                className="w-5 h-5"
-            />
-        </div>
-        <div className="flex flex-col justify-center w-full">
-            {isEditing ? (
-                <>
-                    <input
-                        type="text"
-                        value={name || ''}
-                        onChange={(e) => onChange('name', e.target.value)}
-                        className="text-[#141414] text-base font-medium leading-normal line-clamp-1 focus:outline-none px-2 py-1 rounded mb-1 border-none"
-                    />
-                    <input
-                        type="text"
-                        value={lastChecked || ''}
-                        onChange={(e) => onChange('lastChecked', e.target.value)}
-                        className="text-neutral-500 text-sm font-normal leading-normal line-clamp-2 focus:outline-none px-2 py-1 rounded border-none"
-                    />
-                </>
-            ) : (
-                <>
-                    <p className="text-[#141414] text-base font-medium leading-normal line-clamp-1">{name || '정보 없음'}</p>
-                    <p className="text-neutral-500 text-sm font-normal leading-normal line-clamp-2">마지막 검사일: {lastChecked || '정보 없음'}</p>
-                </>
-            )}
-        </div>
-    </div>
-);
 
 export default Main;
