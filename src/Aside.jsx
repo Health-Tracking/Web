@@ -1,16 +1,18 @@
 import React, { useContext } from 'react';
 import { PatientContext } from './App';
 import { db } from './firebase';
-import { collection, addDoc } from 'firebase/firestore';
+import { collection, addDoc, setDoc, doc } from 'firebase/firestore';
 
 const Aside = () => {
     const { searchTerm, setSearchTerm, patients, setPatients, user } = useContext(PatientContext);
 
     const addPatient = async () => {
+        const docRef = await addDoc(collection(db, 'patients'), {});
+
         const newPatient = {
             name: "새 환자",
             age: "정보 없음",
-            id: Date.now(),
+            id: docRef.id,
             image: "정보 없음",
             gender: "정보 없음",
             height: "정보 없음",
@@ -35,13 +37,19 @@ const Aside = () => {
                 { icon: "정보 없음", name: "정보 없음", lastChecked: "정보 없음" }
             ],
             messages: [],
+            aiMessages: [
+                // {
+                //     content: string,
+                //     sender: string,
+                //     timestamp: Date
+                // }
+            ],
             doctorId: user.uid // 환자를 생성한 의사의 ID를 저장
         };
 
         try {
-            const docRef = await addDoc(collection(db, `patients`), newPatient);
-            console.log("Document written with ID: ", docRef.id);
-            setPatients([{ ...newPatient, id: docRef.id }, ...patients]);
+            await setDoc(doc(db, 'patients', docRef.id), newPatient);
+            setPatients([{ ...newPatient }, ...patients]);
         } catch (e) {
             console.error("Error adding document: ", e);
         }
