@@ -1,7 +1,6 @@
 # 환자 모니터링 시스템
 
 ## 관련 링크
-[웹페이지 링크](https://mellifluous-frangollo-878d87.netlify.app/)
 
 [Mobile Repository](https://github.com/Health-Tracking/Mobile)
 
@@ -40,13 +39,6 @@
 ### 4. 데이터 시각화
 - 측정된 건강 지표들을 그래프로 표현하여 트렌드를 쉽게 확인할 수 있습니다.
 
-## 사용 기술
-
-[여기에 프로젝트에서 사용된 주요 기술 스택을 나열하세요]
-
-## 설치 및 사용 방법
-
-[앱 설치 방법 및 기본적인 사용 가이드를 제공하세요]
 
 ## 연락처
 [백은호][bhh0214@gmail.com]
